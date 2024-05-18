@@ -1,11 +1,11 @@
 import sys
 from enum import Enum, unique
 
-from .api.app import run_api
-from .chat.chat_model import run_chat
-from .eval.evaluator import run_eval
-from .train.tuner import export_model, run_exp
-from .webui.interface import run_web_demo, run_web_ui
+from llamafactory.api.app import run_api
+from llamafactory.chat.chat_model import run_chat
+from llamafactory.eval.evaluator import run_eval
+from llamafactory.train.tuner import export_model, run_exp
+from llamafactory.webui.interface import run_web_demo, run_web_ui
 
 
 USAGE = (

@@ -1,0 +1,5 @@
+cache_dir: null
+lang: en
+last_model: unholy
+path_dict:
+  unholy: models/unholy-v2-13b.Q8_0.gguf
