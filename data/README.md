@@ -1,16 +1,17 @@
-If you are using a custom dataset, please add your **dataset description** to `dataset_info.json` according to the following format. We also provide several examples in the next section.
+The [dataset_info.json](dataset_info.json) contains all available datasets. If you are using a custom dataset, please **make sure** to add a *dataset description* in `dataset_info.json` and specify `dataset: dataset_name` before training to use it.
+
+Currently we support datasets in **alpaca** and **sharegpt** format.
 
 ```json
 "dataset_name": {
   "hf_hub_url": "the name of the dataset repository on the Hugging Face hub. (if specified, ignore script_url and file_name)",
-  "ms_hub_url": "the name of the dataset repository on the ModelScope hub. (if specified, ignore script_url and file_name)",
+  "ms_hub_url": "the name of the dataset repository on the Model Scope hub. (if specified, ignore script_url and file_name)",
   "script_url": "the name of the directory containing a dataset loading script. (if specified, ignore file_name)",
-  "file_name": "the name of the dataset file in this directory. (required if above are not specified)",
-  "file_sha1": "the SHA-1 hash value of the dataset file. (optional, does not affect training)",
+  "file_name": "the name of the dataset folder or dataset file in this directory. (required if above are not specified)",
+  "formatting": "the format of the dataset. (optional, default: alpaca, can be chosen from {alpaca, sharegpt})",
+  "ranking": "whether the dataset is a preference dataset or not. (default: False)",
   "subset": "the name of the subset. (optional, default: None)",
   "folder": "the name of the folder of the dataset repository on the Hugging Face hub. (optional, default: None)",
-  "ranking": "whether the dataset is a preference dataset or not. (default: false)",
-  "formatting": "the format of the dataset. (optional, default: alpaca, can be chosen from {alpaca, sharegpt})",
   "columns (optional)": {
     "prompt": "the column name in the dataset containing the prompts. (default: instruction)",
     "query": "the column name in the dataset containing the queries. (default: input)",
@@ -36,11 +37,17 @@ If you are using a custom dataset, please add your **dataset description** to `d
 }
 ```
 
-After that, you can load the custom dataset by specifying `--dataset dataset_name`.
+## Alpaca Format
 
-----
+### Supervised Fine-Tuning Dataset
 
-Currently we support dataset in **alpaca** or **sharegpt** format, the dataset in alpaca format should follow the below format:
+* [Example dataset](alpaca_en_demo.json)
+
+In supervised fine-tuning, the `instruction` column will be concatenated with the `input` column and used as the human prompt, then the human prompt would be `instruction\ninput`. The `output` column represents the model response.
+
+The `system` column will be used as the system prompt if specified.
+
+The `history` column is a list consisting of string tuples representing prompt-response pairs in the history messages. Note that the responses in the history **will also be learned by the model** in supervised fine-tuning.
 
 ```json
 [
@@ -57,7 +64,7 @@ Currently we support dataset in **alpaca** or **sharegpt** format, the dataset i
 ]
 ```
 
-Regarding the above dataset, the description in `dataset_info.json` should be:
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
 
 ```json
 "dataset_name": {
@@ -72,11 +79,11 @@ Regarding the above dataset, the description in `dataset_info.json` should be:
 }
 ```
 
-The `query` column will be concatenated with the `prompt` column and used as the human prompt, then the human prompt would be `prompt\nquery`. The `response` column represents the model response.
+### Pre-training Dataset
 
-The `system` column will be used as the system prompt. The `history` column is a list consisting string tuples representing prompt-response pairs in the history. Note that the responses in the history **will also be used for training** in supervised fine-tuning.
+- [Example dataset](c4_demo.json)
 
-For the **pre-training datasets**, only the `prompt` column will be used for training, for example:
+In pre-training, only the `text` column will be used for model learning.
 
 ```json
 [
@@ -85,7 +92,7 @@ For the **pre-training datasets**, only the `prompt` column will be used for tra
 ]
 ```
 
-Regarding the above dataset, the description in `dataset_info.json` should be:
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
 
 ```json
 "dataset_name": {
@@ -96,20 +103,24 @@ Regarding the above dataset, the description in `dataset_info.json` should be:
 }
 ```
 
-For the **preference datasets**, the `response` column should be a string list whose length is 2, with the preferred answers appearing first, for example:
+### Preference Dataset
+
+Preference datasets are used for reward modeling, DPO training and ORPO training.
+
+It requires a better response in `chosen` column and a worse response in `rejected` column.
 
 ```json
 [
   {
-    "instruction": "human instruction",
-    "input": "human input",
-    "chosen": "chosen answer",
-    "rejected": "rejected answer"
+    "instruction": "human instruction (required)",
+    "input": "human input (optional)",
+    "chosen": "chosen answer (required)",
+    "rejected": "rejected answer (required)"
   }
 ]
 ```
 
-Regarding the above dataset, the description in `dataset_info.json` should be:
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
 
 ```json
 "dataset_name": {
@@ -124,9 +135,79 @@ Regarding the above dataset, the description in `dataset_info.json` should be:
 }
 ```
 
-----
+### KTO Dataset
 
-The dataset in **sharegpt** format should follow the below format:
+- [Example dataset](kto_en_demo.json)
+
+KTO datasets require a extra `kto_tag` column containing the boolean human feedback.
+
+```json
+[
+  {
+    "instruction": "human instruction (required)",
+    "input": "human input (optional)",
+    "output": "model response (required)",
+    "kto_tag": "human feedback [true/false] (required)"
+  }
+]
+```
+
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
+
+```json
+"dataset_name": {
+  "file_name": "data.json",
+  "columns": {
+    "prompt": "instruction",
+    "query": "input",
+    "response": "output",
+    "kto_tag": "kto_tag"
+  }
+}
+```
+
+### Multimodal Dataset
+
+- [Example dataset](mllm_demo.json)
+
+Multimodal datasets require a `images` column containing the paths to the input images. Currently we only support one image.
+
+```json
+[
+  {
+    "instruction": "human instruction (required)",
+    "input": "human input (optional)",
+    "output": "model response (required)",
+    "images": [
+      "image path (required)"
+    ]
+  }
+]
+```
+
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
+
+```json
+"dataset_name": {
+  "file_name": "data.json",
+  "columns": {
+    "prompt": "instruction",
+    "query": "input",
+    "response": "output",
+    "images": "images"
+  }
+}
+```
+
+## Sharegpt Format
+
+### Supervised Fine-Tuning Dataset
+
+- [Example dataset](glaive_toolcall_en_demo.json)
+
+Compared to the alpaca format, the sharegpt format allows the datasets have **more roles**, such as human, gpt, observation and function. They are presented in a list of objects in the `conversations` column.
+
+Note that the human and observation should appear in odd positions, while gpt and function should appear in even positions.
 
 ```json
 [
@@ -135,6 +216,14 @@ The dataset in **sharegpt** format should follow the below format:
       {
         "from": "human",
         "value": "human instruction"
+      },
+      {
+        "from": "function_call",
+        "value": "tool arguments"
+      },
+      {
+        "from": "observation",
+        "value": "tool result"
       },
       {
         "from": "gpt",
@@ -147,7 +236,7 @@ The dataset in **sharegpt** format should follow the below format:
 ]
 ```
 
-Regarding the above dataset, the description in `dataset_info.json` should be:
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
 
 ```json
 "dataset_name": {
@@ -157,19 +246,63 @@ Regarding the above dataset, the description in `dataset_info.json` should be:
     "messages": "conversations",
     "system": "system",
     "tools": "tools"
-  },
-  "tags": {
-    "role_tag": "from",
-    "content_tag": "value",
-    "user_tag": "human",
-    "assistant_tag": "gpt"
   }
 }
 ```
 
-where the `messages` column should be a list following the `u/a/u/a/u/a` order.
+### Preference Dataset
 
-We also supports the dataset in the **openai** format:
+- [Example dataset](dpo_en_demo.json)
+
+Preference datasets in sharegpt format also require a better message in `chosen` column and a worse message in `rejected` column.
+
+```json
+[
+  {
+    "conversations": [
+      {
+        "from": "human",
+        "value": "human instruction"
+      },
+      {
+        "from": "gpt",
+        "value": "model response"
+      },
+      {
+        "from": "human",
+        "value": "human instruction"
+      }
+    ],
+    "chosen": {
+      "from": "gpt",
+      "value": "chosen answer (required)"
+    },
+    "rejected": {
+      "from": "gpt",
+      "value": "rejected answer (required)"
+    }
+  }
+]
+```
+
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
+
+```json
+"dataset_name": {
+  "file_name": "data.json",
+  "formatting": "sharegpt",
+  "ranking": true,
+  "columns": {
+    "messages": "conversations",
+    "chosen": "chosen",
+    "rejected": "rejected"
+  }
+}
+```
+
+### OpenAI Format
+
+The openai format is simply a special case of the sharegpt format, where the first message may be a system prompt.
 
 ```json
 [
@@ -192,7 +325,7 @@ We also supports the dataset in the **openai** format:
 ]
 ```
 
-Regarding the above dataset, the description in `dataset_info.json` should be:
+Regarding the above dataset, the *dataset description* in `dataset_info.json` should be:
 
 ```json
 "dataset_name": {
@@ -211,4 +344,6 @@ Regarding the above dataset, the description in `dataset_info.json` should be:
 }
 ```
 
-Pre-training datasets and preference datasets are **incompatible** with the sharegpt format yet.
+The KTO datasets and multimodal datasets in sharegpt format are similar to the alpaca format.
+
+Pre-training datasets are **incompatible** with the sharegpt format.
