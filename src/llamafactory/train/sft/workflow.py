@@ -28,8 +28,10 @@ def run_sft(
     generating_args: "GeneratingArguments",
     callbacks: Optional[List["TrainerCallback"]] = None,
 ):
-    tokenizer_module = load_tokenizer(model_args)
-    tokenizer = tokenizer_module["tokenizer"]
+    tokenizer_module = load_tokenizer(
+        model_args
+    )  # NOTE: This is where the GPU is detected and the compute dtype is set to float16
+    tokenizer = tokenizer_module.get("tokenizer", None)  # NOTE: Changed this to make it error safe.
     dataset = get_dataset(model_args, data_args, training_args, stage="sft", **tokenizer_module)
     model = load_model(tokenizer, model_args, finetuning_args, training_args.do_train)
 

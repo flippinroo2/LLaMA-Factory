@@ -267,6 +267,9 @@ class Runner:
             env["CUDA_VISIBLE_DEVICES"] = os.environ.get("CUDA_VISIBLE_DEVICES", "0")
             env["LLAMABOARD_ENABLED"] = "1"
             self.trainer = Popen("llamafactory-cli train {}".format(save_cmd(args)), env=env, shell=True)
+            # self.trainer = Popen(["bash", "-c", "llamafactory-cli train {}".format(save_cmd(args))], env=env, shell=True) # NOTE: Modified this to use bash instead of sh
+
+            # self.trainer = Popen("bash -c llamafactory-cli train {}".format(save_cmd(args)), env=env, shell=True)
             yield from self.monitor()
 
     def preview_train(self, data):

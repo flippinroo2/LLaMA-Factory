@@ -1,3 +1,41 @@
+[tool.poetry]
+name = "LLaMA-Factory"
+version = "0.0.1"
+description = "Easy-to-use LLM fine-tuning framework"
+authors = [
+  "hiyouga <hiyouga@buaa.edu.cn>",
+  "Flippinroo2 <flippinroo2@gmx.com>"
+]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+# transformers = ">=4.37.2"
+transformers = { path = "../../libraries/libraries/transformers", develop = true }
+datasets = ">=2.14.3"
+# accelerate = ">=0.27.2"
+accelerate = { path = "../../libraries/libraries/accelerate", develop = true }
+# peft = ">=0.10.0"
+peft = { path = "../../libraries/libraries/peft", develop = true }
+trl = ">=0.8.1"
+gradio = ">=4.0.0"
+scipy = "*"
+einops = "*"
+sentencepiece = "*"
+protobuf = "*"
+uvicorn = "*"
+pydantic = "*"
+fastapi = "*"
+sse-starlette = "*"
+matplotlib = ">=3.7.0"
+fire = "*"
+packaging = "*"
+pyyaml = "*"
+
+# [build-system]
+# requires = ["poetry-core"]
+# build-backend = "poetry.core.masonry.api"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
