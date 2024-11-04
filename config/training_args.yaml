@@ -1,18 +1,18 @@
 top.booster: auto
 top.checkpoint_path: null
 top.finetuning_type: full
-top.model_name: Phi-2-2.7B
+top.model_name: Phi-3-4B-128k-Instruct
 top.quantization_bit: none
 top.quantization_method: bitsandbytes
 top.rope_scaling: none
-top.template: default
+top.template: phi
 train.additional_target: ''
 train.badam_mode: layer
 train.badam_switch_interval: 50
 train.badam_switch_mode: ascending
 train.badam_update_ratio: 0.05
-train.batch_size: 1
-train.compute_type: bf16
+train.batch_size: 2
+train.compute_type: fp16
 train.create_new_adapter: false
 train.cutoff_len: 1024
 train.dataset:
@@ -27,7 +27,7 @@ train.galore_rank: 16
 train.galore_scale: 0.25
 train.galore_target: all
 train.galore_update_interval: 20
-train.gradient_accumulation_steps: 1
+train.gradient_accumulation_steps: 10
 train.learning_rate: 1e-1
 train.logging_steps: 5
 train.lora_alpha: 16
