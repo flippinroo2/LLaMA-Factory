@@ -75,9 +75,8 @@ class Command(str, Enum):
 
 
 def main():
-    # Set the memory fraction (0.9 = 7.2GB / 8GB)
-    torch.cuda.set_per_process_memory_fraction(0.9)
-    print("torch.cuda.set_per_process_memory_fraction(0.9) - AKA 90%")
+    # torch.cuda.set_per_process_memory_fraction(0.9) # Set the memory fraction (0.9 = 7.2GB / 8GB)
+    # print("torch.cuda.set_per_process_memory_fraction(0.9) - AKA 90%")
     command = sys.argv.pop(1) if len(sys.argv) != 1 else Command.HELP
     if command == Command.API:
         run_api()

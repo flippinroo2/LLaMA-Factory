@@ -1,11 +1,11 @@
 top.booster: auto
-top.checkpoint_path: null
-top.finetuning_type: full
-top.model_name: Phi-3-4B-128k-Instruct
+top.checkpoint_path: []
+top.finetuning_type: lora
+top.model_name: OLMo-1B
 top.quantization_bit: none
 top.quantization_method: bitsandbytes
 top.rope_scaling: none
-top.template: phi
+top.template: default
 train.additional_target: ''
 train.badam_mode: layer
 train.badam_switch_interval: 50
@@ -18,7 +18,7 @@ train.cutoff_len: 1024
 train.dataset:
 - dpo_en_demo
 train.dataset_dir: data
-train.ds_offload: false
+train.ds_offload: true
 train.ds_stage: none
 train.freeze_extra_modules: ''
 train.freeze_trainable_layers: 1
@@ -27,8 +27,8 @@ train.galore_rank: 16
 train.galore_scale: 0.25
 train.galore_target: all
 train.galore_update_interval: 20
-train.gradient_accumulation_steps: 10
-train.learning_rate: 1e-1
+train.gradient_accumulation_steps: 16
+train.learning_rate: 1e-2
 train.logging_steps: 5
 train.lora_alpha: 16
 train.lora_dropout: 0
@@ -38,10 +38,10 @@ train.loraplus_lr_ratio: 0
 train.lr_scheduler_type: cosine
 train.mask_history: false
 train.max_grad_norm: '1.0'
-train.max_samples: '1'
+train.max_samples: '10'
 train.neat_packing: false
 train.neftune_alpha: 0
-train.num_train_epochs: '1.0'
+train.num_train_epochs: '3.0'
 train.optim: adamw_torch
 train.packing: false
 train.ppo_score_norm: false
